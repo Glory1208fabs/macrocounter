@@ -1,6 +1,7 @@
 import { colors } from '@/src/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { View } from 'react-native';
 
 export default function TabLayout() {
   return (
@@ -8,11 +9,20 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.surface,
+          backgroundColor: colors.surface,
+          borderTopColor: 'rgba(255,255,255,0.06)',
+          borderTopWidth: 1,
+          paddingTop: 8,
+          paddingBottom: 24,
+          height: 80,
         },
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 2,
+        },
       }}
     >
       <Tabs.Screen
@@ -29,7 +39,19 @@ export default function TabLayout() {
         options={{
           title: 'Add Meal',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name='add-circle' size={size} color={color} />
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                backgroundColor: colors.primary,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: -16,
+              }}
+            >
+              <Ionicons name='add' size={28} color={colors.background} />
+            </View>
           ),
         }}
       />

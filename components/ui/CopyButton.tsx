@@ -29,8 +29,8 @@ export default function CopyButton({ meals }: CopyButtonProps) {
   };
 
   return (
-    <TouchableOpacity style={styles.button} onPress={handleCopy}>
-      <Ionicons name='copy-outline' size={18} color={colors.primary} />
+    <TouchableOpacity style={styles.button} onPress={handleCopy} activeOpacity={0.7}>
+      <Ionicons name='copy-outline' size={16} color={colors.primary} />
       <Text style={styles.text}>Copy Summary</Text>
     </TouchableOpacity>
   );
@@ -41,10 +41,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 16,
+    backgroundColor: colors.surface,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   text: {
     color: colors.primary,
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

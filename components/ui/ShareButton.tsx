@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Share, TouchableOpacity } from 'react-native';
+import { Share, StyleSheet, TouchableOpacity } from 'react-native';
 import { Meal } from '@/src/storage/meals';
 import { colors } from '@/src/styles/global';
 
@@ -25,8 +25,21 @@ export default function ShareButton({ meals }: ShareButtonProps) {
   };
 
   return (
-    <TouchableOpacity onPress={handleShare}>
-      <Ionicons name='share-outline' size={24} color={colors.primary} />
+    <TouchableOpacity onPress={handleShare} style={styles.button} activeOpacity={0.7}>
+      <Ionicons name='share-outline' size={20} color={colors.primary} />
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+});
