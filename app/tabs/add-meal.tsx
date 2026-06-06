@@ -1,5 +1,6 @@
 import { addMeal } from '@/src/storage/meals';
 import { colors, globalStyles } from '@/src/styles/global';
+import { alert as showAlert, confirm } from '@/src/utils/alert';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -46,7 +47,7 @@ export default function AddMealScreen() {
     const ImagePicker = await import('expo-image-picker');
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission needed', 'Allow access to your photo library to add meal images.');
+      await showAlert('Permission needed', 'Allow access to your photo library to add meal images.');
       return;
     }
 
@@ -70,7 +71,7 @@ export default function AddMealScreen() {
     const ImagePicker = await import('expo-image-picker');
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission needed', 'Allow access to your camera to take meal photos.');
+      await showAlert('Permission needed', 'Allow access to your camera to take meal photos.');
       return;
     }
 
@@ -99,8 +100,8 @@ export default function AddMealScreen() {
 
   const handleAddMeal = async () => {
     if (!name || !calories) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Error', 'Please enter a meal name and calories.');
+      try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); } catch {}
+      await showAlert('Error', 'Please enter a meal name and calories.');
       return;
     }
 
@@ -113,7 +114,7 @@ export default function AddMealScreen() {
       imageUri: imageUri || undefined,
     });
 
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
 
     setName('');
     setCalories('');
@@ -122,10 +123,10 @@ export default function AddMealScreen() {
     setFat('');
     setImageUri(null);
 
-    Alert.alert('Success', 'Meal added successfully!', [
-      { text: 'View Meals', onPress: () => router.push('/tabs/meals') },
-      { text: 'Add Another', style: 'cancel' },
-    ]);
+    const viewMeals = await confirm('Success', 'Meal added successfully! Would you like to view all meals?');
+    if (viewMeals) {
+      router.push('/tabs/meals');
+    }
   };
 
   return (

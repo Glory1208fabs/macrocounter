@@ -4,7 +4,8 @@ import { colors, globalStyles } from '@/src/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { confirm } from '@/src/utils/alert';
 
 export default function AllMealsScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
@@ -15,17 +16,11 @@ export default function AllMealsScreen() {
   };
 
   const handleClearAll = async () => {
-    Alert.alert('Clear All Meals', 'This will delete all your logged meals. Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Clear All',
-        style: 'destructive',
-        onPress: async () => {
-          await clearAllMeals();
-          loadMeals();
-        },
-      },
-    ]);
+    const ok = await confirm('Clear All Meals', 'This will delete all your logged meals. Are you sure?');
+    if (ok) {
+      await clearAllMeals();
+      loadMeals();
+    }
   };
 
   useFocusEffect(

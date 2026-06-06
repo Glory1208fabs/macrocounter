@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { deleteMeal } from '@/src/storage/meals';
 import { colors } from '@/src/styles/global';
+import { confirm } from '@/src/utils/alert';
 
 type MealItemProps = {
   id: string;
@@ -51,18 +52,12 @@ export default function MealItem({
   imageUri,
   onDelete,
 }: MealItemProps) {
-  const handleDelete = () => {
-    Alert.alert('Delete Meal', `Are you sure you want to delete "${name}"?`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteMeal(id);
-          onDelete();
-        },
-      },
-    ]);
+  const handleDelete = async () => {
+    const ok = await confirm('Delete Meal', `Are you sure you want to delete "${name}"?`);
+    if (ok) {
+      await deleteMeal(id);
+      onDelete();
+    }
   };
 
   const icon = getIcon(name);
