@@ -1,10 +1,12 @@
 import { addMeal } from '@/src/storage/meals';
 import { colors, globalStyles } from '@/src/styles/global';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -22,6 +24,52 @@ export default function AddMealScreen() {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission needed', 'Allow access to your photo library to add meal images.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission needed', 'Allow access to your camera to take meal photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleImagePick = () => {
+    Alert.alert('Add Meal Photo', 'Choose how to add a photo for this meal', [
+      { text: 'Camera', onPress: takePhoto },
+      { text: 'Gallery', onPress: pickImage },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
 
   const handleAddMeal = async () => {
     if (!name || !calories) {
@@ -36,6 +84,7 @@ export default function AddMealScreen() {
       protein: Number(protein) || 0,
       carbs: Number(carbs) || 0,
       fat: Number(fat) || 0,
+      imageUri: imageUri || undefined,
     });
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -45,6 +94,7 @@ export default function AddMealScreen() {
     setProtein('');
     setCarbs('');
     setFat('');
+    setImageUri(null);
 
     Alert.alert('Success', 'Meal added successfully!', [
       { text: 'View Meals', onPress: () => router.push('/tabs/meals') },
@@ -67,6 +117,17 @@ export default function AddMealScreen() {
 
         <View style={styles.formSection}>
           <Text style={styles.sectionLabel}>Meal Details</Text>
+
+          <TouchableOpacity style={styles.imagePicker} onPress={handleImagePick} activeOpacity={0.7}>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.previewImage} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Ionicons name='camera-outline' size={24} color={colors.textMuted} />
+                <Text style={styles.imagePlaceholderText}>Add Photo</Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
           <View style={styles.inputGroup}>
             <View style={styles.inputIcon}>
@@ -176,6 +237,32 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginBottom: 12,
+  },
+  imagePicker: {
+    width: '100%',
+    height: 140,
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginBottom: 10,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    borderStyle: 'dashed',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  imagePlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  imagePlaceholderText: {
+    color: colors.textMuted,
+    fontSize: 13,
   },
   inputGroup: {
     flexDirection: 'row',

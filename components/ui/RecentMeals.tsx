@@ -32,6 +32,7 @@ export default function RecentMeals({ meals, onDelete }: RecentMealsProps) {
             protein={meal.protein}
             carbs={meal.carbs}
             fat={meal.fat}
+            imageUri={meal.imageUri}
             onDelete={onDelete}
           />
         ))

@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -35,8 +34,6 @@ const slides = [
   },
 ];
 
-const ONBOARDING_KEY = 'onboarding_complete';
-
 export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -48,8 +45,7 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleGetStarted = async () => {
-    await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+  const handleGetStarted = () => {
     router.replace('/tabs');
   };
 

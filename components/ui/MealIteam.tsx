@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { deleteMeal } from '@/src/storage/meals';
 import { colors } from '@/src/styles/global';
 
@@ -10,6 +10,7 @@ type MealItemProps = {
   protein: number;
   carbs: number;
   fat: number;
+  imageUri?: string;
   onDelete: () => void;
 };
 
@@ -47,9 +48,10 @@ export default function MealItem({
   protein,
   carbs,
   fat,
+  imageUri,
   onDelete,
 }: MealItemProps) {
-  const handleLongPress = () => {
+  const handleDelete = () => {
     Alert.alert('Delete Meal', `Are you sure you want to delete "${name}"?`, [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -66,15 +68,20 @@ export default function MealItem({
   const icon = getIcon(name);
 
   return (
-    <TouchableOpacity style={styles.container} onLongPress={handleLongPress} activeOpacity={0.7}>
-      <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={22} color={colors.primaryLight} />
-      </View>
+    <View style={styles.container}>
+      {imageUri ? (
+        <Image source={{ uri: imageUri }} style={styles.image} />
+      ) : (
+        <View style={styles.iconWrap}>
+          <Ionicons name={icon} size={22} color={colors.primaryLight} />
+        </View>
+      )}
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={1}>{name}</Text>
-        <Text style={styles.macros}>
-          {calories} cal
-        </Text>
+        <View style={styles.caloriesRow}>
+          <Ionicons name='flame-outline' size={12} color={colors.textSecondary} />
+          <Text style={styles.calories}> {calories} cal</Text>
+        </View>
       </View>
       <View style={styles.macroBadges}>
         <View style={[styles.badge, { backgroundColor: '#4ecdc420' }]}>
@@ -87,7 +94,10 @@ export default function MealItem({
           <Text style={[styles.badgeText, { color: '#6bcb77' }]}>{fat}F</Text>
         </View>
       </View>
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDelete} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+        <Ionicons name='trash-outline' size={16} color={colors.alert} />
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -95,12 +105,18 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
     borderRadius: 14,
-    padding: 14,
+    padding: 12,
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
+  },
+  image: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    marginRight: 12,
   },
   iconWrap: {
     width: 42,
@@ -119,14 +135,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.text,
   },
-  macros: {
+  caloriesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  calories: {
     fontSize: 13,
     color: colors.textSecondary,
-    marginTop: 2,
   },
   macroBadges: {
     flexDirection: 'row',
     gap: 4,
+    marginRight: 4,
   },
   badge: {
     paddingHorizontal: 6,
@@ -136,5 +157,13 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '700',
+  },
+  deleteButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,82,82,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
