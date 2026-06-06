@@ -1,9 +1,8 @@
 import { addMeal } from '@/src/storage/meals';
 import { colors, globalStyles } from '@/src/styles/global';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -25,8 +24,26 @@ export default function AddMealScreen() {
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const uri = URL.createObjectURL(file);
+      setImageUri(uri);
+    }
+  };
+
+  const handleWebGallery = () => {
+    fileInputRef.current?.click();
+  };
 
   const pickImage = async () => {
+    if (Platform.OS === 'web') {
+      handleWebGallery();
+      return;
+    }
+    const ImagePicker = await import('expo-image-picker');
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert('Permission needed', 'Allow access to your photo library to add meal images.');
@@ -46,6 +63,11 @@ export default function AddMealScreen() {
   };
 
   const takePhoto = async () => {
+    if (Platform.OS === 'web') {
+      handleWebGallery();
+      return;
+    }
+    const ImagePicker = await import('expo-image-picker');
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
       Alert.alert('Permission needed', 'Allow access to your camera to take meal photos.');
@@ -64,6 +86,10 @@ export default function AddMealScreen() {
   };
 
   const handleImagePick = () => {
+    if (Platform.OS === 'web') {
+      handleWebGallery();
+      return;
+    }
     Alert.alert('Add Meal Photo', 'Choose how to add a photo for this meal', [
       { text: 'Camera', onPress: takePhoto },
       { text: 'Gallery', onPress: pickImage },
@@ -105,6 +131,16 @@ export default function AddMealScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView style={globalStyles.container} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
+        {Platform.OS === 'web' && (
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='image/*'
+            style={{ display: 'none' }}
+            onChange={handleFileSelected}
+          />
+        )}
+
         <View style={globalStyles.header}>
           <View>
             <Text style={globalStyles.title}>Add Meal</Text>
